@@ -28,7 +28,9 @@
         }
 
         .header img {
-            height: 40px;
+            max-height: 40px; /* 로고 찌그러짐 방지 */
+            width: auto; /* 가로 세로 비율 유지 */
+            object-fit: contain;
         }
 
         .header h2 {
@@ -81,7 +83,7 @@
 
 <body style="overflow: auto;">
     <div class="header">
-        <img src="icon.png">
+        <img src="icon.png" alt="로고">
         <h2>주민등록증 모바일 확인서비스</h2>
         
         <!-- 햄버거 버튼 -->
@@ -175,19 +177,6 @@
 
             updateCountdown(); 
             setInterval(updateCountdown, 1000);
-
-            function updateTime() {
-                const now = new Date();
-                const formattedTime = `${now.getFullYear()}년 ${String(now.getMonth() + 1).padStart(2, '0')}월 ${String(now.getDate()).padStart(2, '0')}일 ${String(now.getHours()).padStart(2, '0')}시 ${String(now.getMinutes()).padStart(2, '0')}분 ${String(now.getSeconds()).padStart(2, '0')}초`;
-                $('#current-time').text(formattedTime);
-            }
-
-            updateTime(); 
-            setInterval(updateTime, 1000);
-
-            $("#hamburger").click(function() {
-                $(this).toggleClass("open");
-            });
         });
     </script>
 </body>
