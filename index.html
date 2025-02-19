@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="junglesystem.css">
     <link rel="stylesheet" href="font_SJSejongGothic.css">
     <link rel="stylesheet" href="main.css">
-    <script src="jquery.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>정부24</title>
     <style>
         /* 햄버거 버튼 스타일 */
@@ -36,10 +36,8 @@
             transition: 0.4s;
         }
 
-        /* 햄버거 버튼 클릭 시 애니메이션 효과 */
         .hamburger.open div:nth-child(1) {
             transform: rotate(-45deg);
-            position: relative;
             top: 8px;
         }
 
@@ -49,13 +47,92 @@
 
         .hamburger.open div:nth-child(3) {
             transform: rotate(45deg);
-            position: relative;
             top: -8px;
         }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            z-index: 10000;
+            text-align: center;
+        }
+
+        .modal img {
+            max-width: 120px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .back {
+            text-align: center;
+            cursor: pointer;
+            padding: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* 토글 스위치 스타일 (상세정보용) */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 34px;
+            height: 20px;
+            margin-left: 10px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(14px);
+        }
+
     </style>
 </head>
 
-<body style="overflow: auto;">
+<body>
     <div class="header">
         <img src="icon.png">
         <h2 style="display:inline-block; margin-right: 40px;">주민등록증 모바일 확인서비스</h2>
@@ -83,7 +160,6 @@
             <p class="progressbar_text">남은시간</p>
             <p class="progressbar_time">30초</p>
             <p class="QR_text">QR코드를 리더기에 스캔하세요</p>
-            <p id="current-time" style="text-align: center; font-size: 14px; margin-top: 10px;"></p>
 
             <div class="box_footer">
                 <p class="js-click-modal">상세정보 표시</p>
@@ -91,88 +167,52 @@
         </div>
 
         <!-- 상세정보 모달 -->
-        <div class="modal" style="display: none;">
+        <div class="modal">
             <div id="box">
                 <img src="shm.jpg">
                 <h1>이름</h1>
-                <h2>060125-3711518</h2>
+                <h2>
+                    <span id="resident-number">060125-*******</span>  
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-mask">
+                        <span class="slider round"></span>
+                    </label>
+                </h2>
                 <h3>인천광역시 미추홀구 번길 아파트 동 호</h3>
-                <h4 style="margin-left: 42%">2023.01.24</h4>
-                <h5 style="margin-left: 35%;">인천광역시 미추홀구청장</h5>
+                <h4 style="text-align: center;">2023.01.24</h4>
+                <h5 style="text-align: center;">인천광역시 미추홀구청장</h5>
             </div>
 
-            <div class="back" style="align-items:center; display: flex; justify-content:center;">
-                <bd><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"></path>
-                </svg></bd>
-            </div>
+            <div class="back">⬅ 돌아가기</div>
         </div>
     </div>
 
-    <!-- 하단 마퀴 텍스트 -->
-    <div id="footer">
-        <marquee><p>캡쳐방지 시스템이 작동 중입니다. 캡쳐방지 시스템이 작동 중입니다. 캡쳐방지 시스템이 작동 중입니다.</p></marquee>
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.slim.js"></script>
     <script>
         $(document).ready(function(){
+            let originalResidentNumber = "060125-3711518";
+            let maskedResidentNumber = originalResidentNumber.replace(/-\d{7}$/, "-*******");
+
+            $("#resident-number").text(maskedResidentNumber);
+
+            $("#toggle-mask").change(function() {
+                if ($(this).is(":checked")) {
+                    $("#resident-number").text(originalResidentNumber);
+                } else {
+                    $("#resident-number").text(maskedResidentNumber);
+                }
+            });
+
             $(".js-click-modal").click(function(){
                 $('.box_main').hide();
-                $('.modal').show();
+                $('.modal').fadeIn();
             });
 
             $(".back").click(function(){
-                $('.box_main').show();
-                $('.modal').hide();
+                $('.modal').fadeOut(function(){
+                    $('.box_main').show();
+                });
             });
 
-            let count = 30;  // 카운트를 바로 30초로 설정
-            let qrImages = ['image1.png', 'image2.png']; 
-            let currentImageIndex = 0; 
-            let isFirst30Seconds = true;  // 첫 번째 30초 구분하는 변수
-
-            // 카운트다운 업데이트 함수
-            function updateCountdown() {
-                if (count >= 0) { 
-                    $('.progressbar_time').text(`${count}초`);
-                    $('#jb').val(count);
-                }
-
-                // 첫 번째 30초 동안은 QR 코드 변경되지 않도록
-                if (count === 30 && isFirst30Seconds) {  
-                    // 첫 30초는 QR 코드 변경하지 않음
-                    isFirst30Seconds = false;  // 첫 번째 30초가 끝났음을 표시
-                } else if (count === 0 && !isFirst30Seconds) {
-                    // 두 번째 30초부터 QR 코드 변경
-                    currentImageIndex = (currentImageIndex + 1) % qrImages.length; 
-                    $('#QR_img').attr('src', qrImages[currentImageIndex]); 
-                    count = 30;  // 30초로 리셋
-                } else {
-                    count -= 1;
-                }
-            }
-
-            // 카운트를 바로 30초로 설정하여 즉시 시작
-            updateCountdown(); 
-
-            // 1초마다 카운트다운 갱신
-            setInterval(updateCountdown, 1000);
-
-            // 현재 시간을 업데이트하는 함수
-            function updateTime() {
-                const now = new Date();
-                const formattedTime = `${now.getFullYear()}년 ${String(now.getMonth() + 1).padStart(2, '0')}월 ${String(now.getDate()).padStart(2, '0')}일 ${String(now.getHours()).padStart(2, '0')}시 ${String(now.getMinutes()).padStart(2, '0')}분 ${String(now.getSeconds()).padStart(2, '0')}초`;
-                $('#current-time').text(formattedTime);
-            }
-
-            // 새로고침 후 현재 시간을 즉시 표시
-            updateTime(); 
-
-            // 1초마다 시간 갱신
-            setInterval(updateTime, 1000);
-
-            // 햄버거 메뉴 클릭 이벤트
             $("#hamburger").click(function() {
                 $(this).toggleClass("open");
             });
@@ -180,3 +220,4 @@
     </script>
 </body>
 </html>
+
