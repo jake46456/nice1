@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta property="og:type" content="website">
+    
+    <meta property="og:title" content="정부24">  
+    <meta property="og:image" content="mobile_icon_!.ico">
+    <link rel="apple-touch-icon" href="mobile_icon.ico">
+    <link rel="shortcut icon" href="mobile_icon.ico">
+    <link rel="stylesheet" href="junglesystem.css">
+    <link rel="stylesheet" href="font_SJSejongGothic.css">
+    <link rel="stylesheet" href="main.css">
+    <script src="jquery.js"></script>
+    <title>정부24</title>
+    <style>
+        /* 햄버거 버튼 스타일 */
+        .hamburger {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            z-index: 9999;
+        }
+
+        .hamburger div {
+            width: 30px;
+            height: 3px;
+            background-color: #333;
+            margin: 5px 0;
+            transition: 0.4s;
+        }
+
+        /* 햄버거 버튼 클릭 시 애니메이션 효과 */
+        .hamburger.open div:nth-child(1) {
+            transform: rotate(-45deg);
+            position: relative;
+            top: 8px;
+        }
+
+        .hamburger.open div:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.open div:nth-child(3) {
+            transform: rotate(45deg);
+            position: relative;
+            top: -8px;
+        }
+    </style>
+</head>
+
+<body style="overflow: auto;">
+    <div class="header">
+        <img src="icon.png">
+        <h2 style="display:inline-block; margin-right: 40px;">주민등록증 모바일 확인서비스</h2>
+        
+        <!-- 햄버거 버튼 -->
+        <div class="hamburger" id="hamburger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <hr color="#ddeaf3">
+    <div id="wrap">
+        <div id="box" class="box_main">
+            <img src="shm.jpg">
+            <h1>최시훈</h1>
+            <h2 style="margin-left: 27px;">07.04.03</h2>
+            <h3>용인시 처인구</h3>
+            <div class="QR_Code">
+                <img id="QR_img" src="image1.png">
+            </div>
+
+            <progress value="30" max="30" id="jb"></progress>
+            <p class="progressbar_text">남은시간</p>
+            <p class="progressbar_time">30초</p>
+            <p class="QR_text">QR코드를 리더기에 스캔하세요</p>
+            <p id="current-time" style="text-align: center; font-size: 14px; margin-top: 10px;"></p>
+
+            <div class="box_footer">
+                <p class="js-click-modal">상세정보 표시</p>
+            </div>
+        </div>
+
+        <!-- 상세정보 모달 -->
+        <div class="modal" style="display: none;">
+            <div id="box">
+                <img src="shm.jpg">
+                <h1>최시훈</h1>
+                <h2>070403-3249212</h2>
+                <h3>용인시 처인구 포곡읍 부곡로 41-23 111동 301호</h3>
+                <h4 style="margin-left: 42%">2023.01.24</h4>
+                <h5 style="margin-left: 35%;">용인시 처인구청장</h5>
+            </div>
+
+            <div class="back" style="align-items:center; display: flex; justify-content:center;">
+                <bd><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"></path>
+                </svg></bd>
+            </div>
+        </div>
+    </div>
+
+    <!-- 하단 마퀴 텍스트 -->
+    <div id="footer">
+        <marquee><p>캡쳐방지 시스템이 작동 중입니다. 캡쳐방지 시스템이 작동 중입니다. 캡쳐방지 시스템이 작동 중입니다.</p></marquee>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".js-click-modal").click(function(){
+                $('.box_main').hide();
+                $('.modal').show();
+            });
+
+            $(".back").click(function(){
+                $('.box_main').show();
+                $('.modal').hide();
+            });
+
+            let count = 30;  // 카운트를 바로 30초로 설정
+            let qrImages = ['image1.png', 'image1.png']; 
+            let currentImageIndex = 0; 
+            let isFirst30Seconds = true;  // 첫 번째 30초 구분하는 변수
+
+            // 카운트다운 업데이트 함수
+            function updateCountdown() {
+                if (count >= 0) { 
+                    $('.progressbar_time').text(`${count}초`);
+                    $('#jb').val(count);
+                }
+
+                // 첫 번째 30초 동안은 QR 코드 변경되지 않도록
+                if (count === 30 && isFirst30Seconds) {  
+                    // 첫 30초는 QR 코드 변경하지 않음
+                    isFirst30Seconds = false;  // 첫 번째 30초가 끝났음을 표시
+                } else if (count === 0 && !isFirst30Seconds) {
+                    // 두 번째 30초부터 QR 코드 변경
+                    currentImageIndex = (currentImageIndex + 1) % qrImages.length; 
+                    $('#QR_img').attr('src', qrImages[currentImageIndex]); 
+                    count = 30;  // 30초로 리셋
+                } else {
+                    count -= 1;
+                }
+            }
+
+            // 카운트를 바로 30초로 설정하여 즉시 시작
+            updateCountdown(); 
+
+            // 1초마다 카운트다운 갱신
+            setInterval(updateCountdown, 1000);
+
+            // 현재 시간을 업데이트하는 함수
+            function updateTime() {
+                const now = new Date();
+                const formattedTime = `${now.getFullYear()}년 ${String(now.getMonth() + 1).padStart(2, '0')}월 ${String(now.getDate()).padStart(2, '0')}일 ${String(now.getHours()).padStart(2, '0')}시 ${String(now.getMinutes()).padStart(2, '0')}분 ${String(now.getSeconds()).padStart(2, '0')}초`;
+                $('#current-time').text(formattedTime);
+            }
+
+            // 새로고침 후 현재 시간을 즉시 표시
+            updateTime(); 
+
+            // 1초마다 시간 갱신
+            setInterval(updateTime, 1000);
+
+            // 햄버거 메뉴 클릭 이벤트
+            $("#hamburger").click(function() {
+                $(this).toggleClass("open");
+            });
+        });
+    </script>
+</body>
+</html>
