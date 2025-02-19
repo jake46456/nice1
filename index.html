@@ -19,11 +19,26 @@
     <script src="jquery.js"></script>
     <title>정부24</title>
     <style>
+        /* 헤더 내부 정렬 수정 */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+        }
+
+        .header img {
+            height: 40px;
+        }
+
+        .header h2 {
+            margin: 0;
+            flex-grow: 1;
+            text-align: center;
+        }
+
         /* 햄버거 버튼 스타일 */
         .hamburger {
-            position: absolute;
-            top: 20px;
-            right: 20px;
             cursor: pointer;
             z-index: 9999;
         }
@@ -36,10 +51,8 @@
             transition: 0.4s;
         }
 
-        /* 햄버거 버튼 클릭 시 애니메이션 효과 */
         .hamburger.open div:nth-child(1) {
             transform: rotate(-45deg);
-            position: relative;
             top: 8px;
         }
 
@@ -49,20 +62,19 @@
 
         .hamburger.open div:nth-child(3) {
             transform: rotate(45deg);
-            position: relative;
             top: -8px;
         }
 
         /* iPhone에서 이미지 위치 조정 */
         img {
-            display: block; /* 인라인 요소 문제 해결 */
+            display: block;
             max-width: 100%;
             height: auto;
         }
 
         .QR_Code img {
             position: relative;
-            top: 0; /* iPhone에서 밀림 현상 방지 */
+            top: 0;
         }
     </style>
 </head>
@@ -70,7 +82,7 @@
 <body style="overflow: auto;">
     <div class="header">
         <img src="icon.png">
-        <h2 style="display:inline-block; margin-right: 40px;">주민등록증 모바일 확인서비스</h2>
+        <h2>주민등록증 모바일 확인서비스</h2>
         
         <!-- 햄버거 버튼 -->
         <div class="hamburger" id="hamburger">
